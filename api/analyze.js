@@ -1,46 +1,5 @@
-import axios from 'axios';
+const axios = require('axios');
 
-// Function to analyze image using Vision API
-async function analyzeImage(base64Image) {
-    try {
-        const response = await axios.post(
-            'https://api.openai.com/v1/chat/completions',
-            {
-                model: 'gpt-4o-mini', // Model adını doğru ayarlayın
-                messages: [
-                    {
-                        role: 'user',
-                        content: [
-                            {
-                                type: 'text',
-                                text: 'What is in this image?',
-                            },
-                            {
-                                type: 'image_url',
-                                image_url: {
-                                    url: `data:image/jpeg;base64,${base64Image}`,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-            {
-                headers: {
-                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                    'Content-Type': 'application/json',
-                },
-            }
-        );
-
-        return response.data.choices[0].message;
-    } catch (error) {
-        console.error('Error calling OpenAI API:', error.message);
-        throw new Error('Failed to analyze image');
-    }
-}
-
-// Vercel'in desteklediği bir serverless işlev olarak export ediyoruz
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
@@ -55,9 +14,36 @@ export default async function handler(req, res) {
     }
 
     try {
-        const result = await analyzeImage(image);
-        res.json({ result });
+        const response = await axios.post(
+            'https://api.openai.com/v1/chat/completions',
+            {
+                model: 'gpt-4o-mini',
+                messages: [
+                    {
+                        role: 'user',
+                        content: [
+                            { type: 'text', text: 'What is in this image?' },
+                            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${image}` } },
+                        ],
+                    },
+                ],
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
+
+        if (response && response.data && response.data.choices) {
+            res.json({ result: response.data.choices[0].message });
+        } else {
+            console.error('Unexpected response format:', response.data);
+            res.status(500).json({ error: 'Unexpected response format from OpenAI API' });
+        }
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error calling OpenAI API:', error);
+        res.status(500).json({ error: `Failed to analyze image: ${error.message}` });
     }
 }
