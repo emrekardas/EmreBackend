@@ -17,7 +17,7 @@ export default async function handler(req, res) {
         const response = await axios.post(
             'https://api.openai.com/v1/chat/completions',
             {
-                model: 'gpt-4o-mini', // Model adını doğru ayarlayın
+                model: 'gpt-4o-mini',
                 messages: [
                     {
                         role: 'user',
@@ -36,9 +36,13 @@ export default async function handler(req, res) {
             }
         );
 
-        res.json({ result: response.data.choices[0].message });
+        if (response && response.data && response.data.choices) {
+            res.json({ result: response.data.choices[0].message });
+        } else {
+            res.status(500).json({ error: 'Unexpected response format from OpenAI API' });
+        }
     } catch (error) {
         console.error('Error calling OpenAI API:', error.message);
-        res.status(500).json({ error: 'Failed to analyze image' });
+        res.status(500).json({ error: `Failed to analyze image: ${error.message}` });
     }
 }
