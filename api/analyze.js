@@ -40,8 +40,17 @@ export default async function handler(req, res) {
             max_tokens: 300
         });
 
+        // Log the response for debugging
+        console.log('OpenAI Response:', JSON.stringify(response.choices[0].message));
+
         if (response && response.choices && response.choices.length > 0) {
-            res.status(200).json({ result: response.choices[0].message });
+            // Send the response in the exact format expected by the Swift app
+            res.status(200).json({
+                result: {
+                    content: response.choices[0].message.content,
+                    role: response.choices[0].message.role
+                }
+            });
         } else {
             console.error('Unexpected response format:', response);
             res.status(500).json({ error: 'Unexpected response format from OpenAI API' });
