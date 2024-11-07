@@ -6,6 +6,8 @@ const openai = new OpenAI({
 });
 
 export default async function handler(req, res) {
+    console.log('API endpoint /api/analyze was hit');
+
     if (req.method !== 'POST') {
         res.status(405).json({ error: 'Method not allowed' });
         return;
