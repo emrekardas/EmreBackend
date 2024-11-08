@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 
 // Initialize OpenAI client
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY // Make sure this is set in Vercel
+    apiKey: process.env.OPENAI_API_KEY  // Check this value
 });
 
 export default async function handler(req, res) {
