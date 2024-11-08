@@ -21,6 +21,7 @@ export default async function handler(req, res) {
                 content: "Image data is required",
                 role: "error"
             }
+            
         });
         return;
     }
