@@ -5,6 +5,7 @@ const next = require('next')
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
 const handle = app.getRequestHandler()
+console.log(process.env.OPENAI_API_KEY);
 
 app.prepare().then(() => {
   createServer((req, res) => {
